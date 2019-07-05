@@ -36,14 +36,14 @@ func main() {
 	handSize := 6
 
 	queue := make([]int, numQueues)
-	retries := 1000000
+	retries := 10000
 
 	for i := 0; i < retries; i++ {
 		hashValue := rand.Uint64()
-		cards := shuffleSharding(hashValue, numQueues, handSize)
-
-		for _, card := range cards {
-			queue[card]++
+		indices := shuffleSharding(hashValue, numQueues, handSize)
+		for _, index := range indices {
+			// fill queue
+			queue[index]++
 		}
 	}
 

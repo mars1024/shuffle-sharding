@@ -7,6 +7,7 @@ import (
 )
 
 var numQueues uint64
+var queue []int
 
 func shuffleDealAndPick(v, nq uint64,
 	mr func(int /*in [0, nq-1]*/) int, /*in [0, numQueues-1] and excluding previously determined members of I*/
@@ -28,6 +29,10 @@ func shuffleDealAndPick(v, nq uint64,
 	}
 	lenI := lengthOfQueue(ii)
 	fmt.Printf("Considering A[%v]=%v, I[%v]=%v, qlen[%v]=%v\n\n", i, ai, i, ii, i, lenI)
+
+	// fill queue
+	queue[ii]++
+
 	if lenI < minLen {
 		minLen = lenI
 		bestIdx = ii
@@ -41,8 +46,14 @@ func lengthOfQueue(i int) int {
 
 func main() {
 	numQueues = uint64(128)
-	handSize := 12
-	hashValue := rand.Uint64()
-	queueIndex := shuffleDealAndPick(hashValue, numQueues, func(i int) int { return i }, handSize, math.MaxInt32, -1)
-	fmt.Printf("For V=%v, numQueues=%v, handSize=%v, chosen queue is %v\n", hashValue, numQueues, handSize, queueIndex)
+	queue = make([]int, numQueues)
+	handSize := 6
+	retries := 10000
+
+	for i := 0; i < retries; i++ {
+		hashValue := rand.Uint64()
+		_ = shuffleDealAndPick(hashValue, numQueues, func(i int) int { return i }, handSize, math.MaxInt32, -1)
+	}
+
+	fmt.Printf("Queue statistics: %+v \n", queue)
 }
