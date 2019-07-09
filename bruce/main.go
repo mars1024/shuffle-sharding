@@ -10,24 +10,24 @@ func shuffleSharding(v, queue uint64, handSize int) []int {
 		return nil
 	}
 
-	ret := make([]int, handSize)
+	as := make([]int, handSize)
 
 	for i := 0; i < handSize; i++ {
-		ret[i] = int(v % (queue - uint64(i)))
+		as[i] = int(v % (queue - uint64(i)))
 	}
 
-	fmt.Printf("A set: %+v \n", ret)
+	fmt.Printf("A set: %+v \n", as)
 
 	// you can choose two kind of algorithms to get real indices
-	// getIndicesByHandQueue(int(queue), handSize, ret)
-	getIndicesByConflictMap(handSize, ret)
+	// ii := getIndicesByHandQueue(int(queue), handSize, as)
+	ii := getIndices(handSize, as)
 
-	fmt.Printf("I set: %+v \n", ret)
+	fmt.Printf("I set: %+v \n", ii)
 
-	return ret
+	return as
 }
 
-func getIndicesByHandQueue(queue, handSize int, hands []int) {
+func getIndicesByHandQueue(queue, handSize int, as []int) []int {
 	handQueue := make([]int, queue)
 
 	for i := 0; i < queue; i++ {
@@ -35,7 +35,7 @@ func getIndicesByHandQueue(queue, handSize int, hands []int) {
 	}
 
 	for i := 0; i < handSize; i++ {
-		ii, ai := 0, hands[i]+1
+		ii, ai := 0, as[i]+1
 		for {
 			if handQueue[ii] == 0 {
 				ai--
@@ -46,27 +46,25 @@ func getIndicesByHandQueue(queue, handSize int, hands []int) {
 			}
 			ii++
 		}
-		hands[i] = ii
+		as[i] = ii
 	}
+
+	return as
 }
 
-func getIndicesByConflictMap(handSize int, hands []int){
-	conflict := make(map[int]bool)
+func getIndices(handSize int, as []int) []int {
+	hands := make([]int, handSize)
 
 	for i := 0; i < handSize; i++ {
-		for j := 0; j < i; j++ {
-			if hands[j] <= hands[i] {
-				hands[i]++
+		ii := as[i]
+		for j := i - 1; j >= 0; j-- {
+			if ii >= as[j] {
+				ii++
 			}
 		}
-		for {
-			if ! conflict[hands[i]] {
-				break
-			}
-			hands[i]++
-		}
-		conflict[hands[i]] = true
+		hands[i] = ii
 	}
+	return hands
 }
 
 func main() {
