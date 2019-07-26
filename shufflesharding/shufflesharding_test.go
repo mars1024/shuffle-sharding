@@ -17,7 +17,7 @@ func TestValidateParameters(t *testing.T) {
 		},
 		{
 			"2",
-			200,
+			8,
 			512,
 			false,
 		},

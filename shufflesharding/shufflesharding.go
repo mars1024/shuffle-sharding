@@ -2,22 +2,22 @@ package shufflesharding
 
 import (
 	"fmt"
-	"math"
+	"math/big"
 )
+
+const maxHashBits = 64
 
 func ValidateParameters(queueSize, handSize uint32) bool {
 	if handSize == 0 || queueSize == 0 || handSize > queueSize {
 		return false
 	}
 
-	p := uint64(0)
+	p := big.NewInt(0)
 	for i := uint32(handSize); i > 0; i-- {
-		p = p*uint64(queueSize-i+1) + uint64(queueSize-i)
-		fmt.Println(p)
+		p.Add(p.Mul(p, big.NewInt(int64(queueSize-i+1))), big.NewInt(int64(queueSize-i)))
 	}
 
-	fmt.Println(p)
-	return p < math.MaxUint64
+	return p.BitLen() <= maxHashBits
 }
 
 func shuffleSharding(v, queue uint64, handSize int) []int {
